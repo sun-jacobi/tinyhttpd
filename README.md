@@ -22,10 +22,11 @@ Reference : https://www.geeksforgeeks.org/socket-programming-cc/
 to connect 2 nodes on a network
 + Socket creation: 
 ```
-int sockfd = socket(domain,type,protocal)
+int sockfd = socket(domain,type,protocol)
 ```
 domain: commnunication domain
 *AP_INET and AF_I NET 6 for IPV6*
+
 type: communication type
 * SOCK_STREAM : TCP
 * SOCK_DGRAM  : UDP
