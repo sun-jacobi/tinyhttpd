@@ -30,6 +30,7 @@ int sockfd = socket(domain,type,protocal);
 ```
 domain: commnunication domain \
 *AP_INET and AF_I NET 6 for IPV6*
+
 type: communication type
 * SOCK_STREAM : TCP
 * SOCK_DGRAM  : UDP
