@@ -2,26 +2,62 @@
 #include <stdio.h>
 #include <sys/socket.h> 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <ctype.h>
 #include <stdlib.h> 
+#include <string.h> 
+
+#define ISspace(x) isspace((int)(x))
 
 int startup(u_short *);
 void error_die(const char*);
 void accept_request(int);
+int get_line(int, char*, int);
+void unimplemented(int);
+
 
 void error_die(const char *sc){
     perror(sc);
     exit(1);
+} 
+
+void accept_request(int client){
+    char buf[1024];
+    int numchars;
+    char method[255];
+    char url[255];
+    char path[512];
+    size_t i,j; 
+    struct stat st; /* from stat.h header  */
+    int cgi = 0; /* becomes true if server decide
+                this is a CGI program */
+    char* query_string = NULL;
+    numchars = get_line(client, buf, sizeof(buf));
+    i = 0; j = 0;
+    while (!ISspace(buf[j]) && (i < sizeof(method) - 1)){
+        method[i] = buf[j];
+        i++; j++;
+    }
+    method[i] = '\0';
+    if (strcasecmp(method,"GET") && strcasecmp(method,"POST")){
+        unimplemented(client);
+        return;
+    }
+    if (strcasecmp(method,"POST") == 0){
+        cgi = 1;
+    }
+    i = 0;
+    
 }
 
 int startup(u_short *port)
 {
     int httpd = 0;
     struct sockaddr_in name;
-    httpd = socket(PF_INET,SOCK_STREAM,0);
+    httpd = socket(PF_INET,SOCK_STREAM,0); /*create a socket for POSIX, TCP , IP*/ 
     if (httpd == -1){
-        error_die("socket");
+        error_die("socket"); /* if failed, then exit */ 
     }
     memset(&name, 0, sizeof(name));
     name.sin_family = AF_INET;
@@ -35,8 +71,8 @@ int startup(u_short *port)
         if (getsockname(httpd,(struct sockaddr*)&name,&namelen) == -1){
             error_die("getsockname");
         };
-        *port = ntohs(name.sin_port);   
-    }
+        *port = ntohs(name.sin_port); 
+    }/* if the post is 0, then allocate a port  */
     if (listen(httpd,5) < 0){
         error_die("bind");      
     }
